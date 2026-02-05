@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bouncing Ball with Gravity</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+        }
+
+        .circle-container {
+            width: 100vw;
+            height: 100vh;
+            background: linear-gradient(90deg, #1dc525 0%, #ac7d2c 100%);
+            position: relative;
+            overflow: hidden;
+        }
+
+        #ball {
+            width: 100px;
+            height: 100px;
+            position: absolute;
+            left: 0;
+            bottom: 0;
+            will-change: transform;
+            transition: box-shadow 0.2s;
+        }
+
+        .bouncing {
+            animation: bounce-scale 0.3s cubic-bezier(.28, .84, .42, 1) alternate infinite;
+        }
+
+        @keyframes bounce-scale {
+            0% {
+                transform: scaleY(1) scaleX(1);
+            }
+
+            80% {
+                transform: scaleY(0.7) scaleX(1.2);
+            }
+
+            100% {
+                transform: scaleY(1.1) scaleX(0.9);
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="circle-container">
+        <img id="ball"
+            src="https://static.vecteezy.com/system/resources/thumbnails/024/254/308/small/beach-ball-3d-icon-png.png"
+            alt="Bouncing Ball">
+    </div>
+    <script>
+        let pos = 0;
+        let velocity = window.innerHeight * 0.13;
+        let gravity = window.innerHeight * 0.006;
+        let bounce = 0.7;
+        let floor = 0;
+        let isBouncing = true;
+        let ball = document.getElementById('ball');
+        let animationFrame;
+
+        let x = 0;
+        let xVelocity = 6;
+        const container = document.querySelector('.circle-container');
+        let maxX = window.innerWidth - 100;
+
+        function animate() {
+            if (!isBouncing) return;
+            velocity -= gravity;
+            pos += velocity;
+
+            if (pos <= floor) {
+                pos = floor;
+                velocity = -velocity * bounce;
+                ball.classList.add('bouncing');
+                if (Math.abs(velocity) < 2) velocity = 0;
+            } else {
+                ball.classList.remove('bouncing');
+            }
+
+            x += xVelocity;
+            if (x > maxX) x = 0;
+
+            ball.style.bottom = pos + "px";
+            ball.style.left = x + "px";
+            animationFrame = requestAnimationFrame(animate);
+        }
+
+        function startBounce() {
+            pos = floor;
+            velocity = window.innerHeight * 0.13;
+            gravity = window.innerHeight * 0.006;
+            isBouncing = true;
+            animate();
+            setTimeout(() => {
+                isBouncing = false;
+                cancelAnimationFrame(animationFrame);
+                ball.classList.remove('bouncing');
+            }, 2000);
+        }
+
+        startBounce();
+
+        setInterval(() => {
+            startBounce();
+        }, 5000);
+
+        setInterval(() => {
+            x = 0;
+        }, 5000);
+
+        window.addEventListener('resize', () => {
+            maxX = window.innerWidth - 100;
+            gravity = window.innerHeight * 0.006;
+        });
+    </script>
+</body>
+
+</html>
